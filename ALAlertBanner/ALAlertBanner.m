@@ -121,7 +121,6 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 @property (nonatomic, readonly) BOOL isAnimating;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *subtitleLabel;
-@property (nonatomic, strong) UIImageView *styleImageView;
 @property (nonatomic) CGRect parentFrameUponCreation;
 
 @end
@@ -166,33 +165,23 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 }
 
 - (void)setupSubviews {
-    _styleImageView = [[UIImageView alloc] init];
-    [self addSubview:_styleImageView];
     
     _titleLabel = [[UILabel alloc] init];
     _titleLabel.backgroundColor = [UIColor clearColor];
-    _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13.f];
-    _titleLabel.textColor = [UIColor colorWithWhite:1.f alpha:0.9f];
-    _titleLabel.textAlignment = NSTextAlignmentLeft;
+    _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:13.f];
+    _titleLabel.textColor = [UIColor colorWithWhite:0.f alpha:0.9f];
+    _titleLabel.textAlignment = NSTextAlignmentCenter;
     _titleLabel.numberOfLines = 1;
     _titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    _titleLabel.layer.shadowColor = [UIColor blackColor].CGColor;
-    _titleLabel.layer.shadowOffset = CGSizeMake(0.f, -1.f);
-    _titleLabel.layer.shadowOpacity = 0.3f;
-    _titleLabel.layer.shadowRadius = 0.f;
     [self addSubview:_titleLabel];
     
     _subtitleLabel = [[UILabel alloc] init];
     _subtitleLabel.backgroundColor = [UIColor clearColor];
     _subtitleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:10.f];
-    _subtitleLabel.textColor = [UIColor colorWithWhite:1.f alpha:0.9f];
+    _subtitleLabel.textColor = [UIColor colorWithWhite:0.f alpha:0.9f];
     _subtitleLabel.textAlignment = NSTextAlignmentLeft;
     _subtitleLabel.numberOfLines = 0;
     _subtitleLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    _subtitleLabel.layer.shadowColor = [UIColor blackColor].CGColor;
-    _subtitleLabel.layer.shadowOffset = CGSizeMake(0.f, -1.f);
-    _subtitleLabel.layer.shadowOpacity = 0.3f;
-    _subtitleLabel.layer.shadowRadius = 0.f;
     [self addSubview:_subtitleLabel];
 }
 
@@ -201,29 +190,6 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 
 -(void)setStyle:(ALAlertBannerStyle)style {
     _style = style;
-    
-    switch (style) {
-        case ALAlertBannerStyleSuccess:
-            self.styleImageView.image = [UIImage imageNamed:@"bannerSuccess.png"];
-            break;
-            
-        case ALAlertBannerStyleFailure:
-            self.styleImageView.image = [UIImage imageNamed:@"bannerFailure.png"];
-            break;
-            
-        case ALAlertBannerStyleNotify:
-            self.styleImageView.image = [UIImage imageNamed:@"bannerNotify.png"];
-            break;
-            
-        case ALAlertBannerStyleWarning:
-            self.styleImageView.image = [UIImage imageNamed:@"bannerAlert.png"];
-            
-            //tone the shadows down a little for the yellow background
-            self.titleLabel.layer.shadowOpacity = 0.2f;
-            self.subtitleLabel.layer.shadowOpacity = 0.2f;
-            
-            break;
-    }
 }
 
 - (void)setShowShadow:(BOOL)showShadow {
@@ -530,7 +496,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     self.parentFrameUponCreation = superview.bounds;
     BOOL isSuperviewKindOfWindow = ([superview isKindOfClass:[UIWindow class]]);
     
-    CGSize maxLabelSize = CGSizeMake(superview.bounds.size.width - (kMargin*3) - self.styleImageView.image.size.width, CGFLOAT_MAX);
+    CGSize maxLabelSize = CGSizeMake(superview.bounds.size.width - (kMargin*3), CGFLOAT_MAX);
     CGFloat titleLabelHeight = AL_SINGLELINE_TEXT_HEIGHT(self.titleLabel.text, self.titleLabel.font);
     CGFloat subtitleLabelHeight = AL_MULTILINE_TEXT_HEIGHT(self.subtitleLabel.text, self.subtitleLabel.font, maxLabelSize, self.subtitleLabel.lineBreakMode);
     CGFloat heightForSelf = titleLabelHeight + subtitleLabelHeight + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2 : kMargin*2.5);
@@ -577,7 +543,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 }
 
 - (void)updateSizeAndSubviewsAnimated:(BOOL)animated {
-    CGSize maxLabelSize = CGSizeMake(self.superview.bounds.size.width - (kMargin*3.f) - self.styleImageView.image.size.width, CGFLOAT_MAX);
+    CGSize maxLabelSize = CGSizeMake(self.superview.bounds.size.width - (kMargin*3.f), CGFLOAT_MAX);
     CGFloat titleLabelHeight = AL_SINGLELINE_TEXT_HEIGHT(self.titleLabel.text, self.titleLabel.font);
     CGFloat subtitleLabelHeight = AL_MULTILINE_TEXT_HEIGHT(self.subtitleLabel.text, self.subtitleLabel.font, maxLabelSize, self.subtitleLabel.lineBreakMode);
     CGFloat heightForSelf = titleLabelHeight + subtitleLabelHeight + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2.f : kMargin*2.5f);
@@ -602,8 +568,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
         [UIView setAnimationDuration:boundsAnimationDuration];
     }
     
-    self.styleImageView.frame = CGRectMake(kMargin, (self.frame.size.height/2.f) - (self.styleImageView.image.size.height/2.f), self.styleImageView.image.size.width, self.styleImageView.image.size.height);
-    self.titleLabel.frame = CGRectMake(self.styleImageView.frame.origin.x + self.styleImageView.frame.size.width + kMargin, kMargin, maxLabelSize.width, titleLabelHeight);
+    self.titleLabel.frame = CGRectMake(kMargin, kMargin, maxLabelSize.width, titleLabelHeight);
     self.subtitleLabel.frame = CGRectMake(self.titleLabel.frame.origin.x, self.titleLabel.frame.origin.y + self.titleLabel.frame.size.height + (self.titleLabel.text == nil ? 0.f : kMargin/2.f), maxLabelSize.width, subtitleLabelHeight);
     
     if (animated) {
@@ -708,11 +673,11 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
             fillColor = [UIColor colorWithRed:(48/255.0) green:(110/255.0) blue:(173/255.0) alpha:1.f];
             break;
         case ALAlertBannerStyleWarning:
-            fillColor = [UIColor colorWithRed:(211/255.0) green:(209/255.0) blue:(100/255.0) alpha:1.f];
+            fillColor = [UIColor colorWithRed:(241/255.0) green:(196/255.0) blue:(15/255.0) alpha:1.f];
             break;
     }
     
-    NSArray *colorsArray = [NSArray arrayWithObjects:(id)[fillColor CGColor], (id)[[fillColor darkerColor] CGColor], nil];
+    NSArray *colorsArray = [NSArray arrayWithObjects:(id)[fillColor CGColor], nil];
     CGColorSpaceRef colorSpace =  CGColorSpaceCreateDeviceRGB();
     const CGFloat locations[2] = {0.f, 1.f};
     CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)colorsArray, locations);
@@ -721,11 +686,6 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     
     CGGradientRelease(gradient);
     CGColorSpaceRelease(colorSpace);
-    
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.6f].CGColor);
-    CGContextFillRect(context, CGRectMake(0.f, rect.size.height - 1.f, rect.size.width, 1.f));
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:1.f green:1.f blue:1.f alpha:0.3f].CGColor);
-    CGContextFillRect(context, CGRectMake(0.f, 0.f, rect.size.width, 1.f));
 }
 
 - (id)nextAvailableViewController:(id)view {
